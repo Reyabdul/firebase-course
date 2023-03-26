@@ -5,6 +5,7 @@ import { updateTodo, deleteTodo } from '../../firebase';
 const Todo = ({ item }) => {
   // const [checked, setChecked] = useState(item.done);
 
+
   const handleCheckbox = () => {
     updateTodo(item.id, { done: !item.done });
   };
