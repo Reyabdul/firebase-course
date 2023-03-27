@@ -13,11 +13,15 @@ async function create(collection, data) {
   // Remove any empty values
   const newData = cleanData(data);
 
+
   const newDocumentRef = db.collection(collection).doc();
 
   const newDocumentId = newDocumentRef.id;
   const createdBy = auth.currentUser.uid;
   const createdAt = Date.now();
+
+  console.log(newData)
+
 
   const finalData = {
     id: newDocumentId,
@@ -25,6 +29,7 @@ async function create(collection, data) {
     createdAt,
     ...newData,
   };
+
 
   await newDocumentRef.set(finalData);
   return newDocumentId;

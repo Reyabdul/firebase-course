@@ -16,7 +16,47 @@ service cloud.firestore {
       resource.data.authorId == request.auth.uid);
     }
 
+
     // Add new rules here
-   
+    function isLogin() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return request.auth.uid == resource.data.uid;
+    }
+
+    function isAdmin(database) {
+      return isLogin() && 
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+    }
+
+    //Any authenticated user may create to-do items for themselves.
+    //Users can view, update and delete their own to-do items.
+    match /todos/{todo} {
+      allow read, write: if 
+        isLogin();
+        //request.auth != null;
+        //allow write: if
+        //request.auth != null;
+    } 
+
+    //Any authenticated user may create a profile and view other users' profiles.
+    match /users/{userId} {
+      allow read, create: if 
+        isLogin();
+      //Admin users can edit any user's profile.
+      allow update: if 
+        isAdmin(database) 
+        //Any authenticated user is allowed to edit their own profile. 
+        || isLogin() && isOwner();   
+    }
+
+    //Only the admin users can make other users admins.
+    match /users/{userId}/isAdmin {
+      allow read, write: if
+        isAdmin(database);
+      
+    }
   }
 }
